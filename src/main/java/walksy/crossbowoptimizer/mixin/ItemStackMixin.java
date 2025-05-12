@@ -24,7 +24,7 @@ public class ItemStackMixin {
      *
      * Normally this is called through serverside packets, which implements a delay on high ms
      * Since we called ItemStack#set client side, it allows the crossbow to be pulled sooner. However, if the player
-     * is pulling the crossnow and ItemStack#set is called declaring ChargedProjectilesComponent as defaukt,
+     * is pulling the crossbow and ItemStack#set is called declaring ChargedProjectilesComponent as defaukt,
      * it will create what I call 'ghost arrows' within the crossbow which tricks the client (desync) into thinking
      * there are arrows in the crossbow, stopping proper calls to fill the crossbow
      */
