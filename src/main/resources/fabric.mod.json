@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "crossbowoptimizer",
+	"version": "${version}",
+	"name": "Crossbow Optimizer",
+	"description": "",
+	"authors": [
+		"Walksy"
+	],
+	"contributors": [
+		"Idea from: ukiff"
+	],
+	"contact": {
+
+	},
+	"license": "MIT",
+	"icon": "assets/walksy/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"walksy.crossbowoptimizer.CrossbowOptimizerMod"
+		]
+	},
+	"mixins": [
+		"mixin.crossbowoptimizer.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"minecraft": "*",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}
