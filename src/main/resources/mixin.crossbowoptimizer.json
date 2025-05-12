@@ -3,7 +3,7 @@
 	"package": "walksy.crossbowoptimizer.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"ClientConnectionMixin",
+		"ClientPlayNetworkHandlerMixin",
 		"CrossbowItemMixin",
 		"ItemStackMixin"
 	],
