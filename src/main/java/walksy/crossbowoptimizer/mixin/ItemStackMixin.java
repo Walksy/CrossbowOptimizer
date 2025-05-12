@@ -1,5 +1,6 @@
 package walksy.crossbowoptimizer.mixin;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.ChargedProjectilesComponent;
@@ -32,6 +33,7 @@ public class ItemStackMixin {
     @Inject(method = "set", at = @At("HEAD"))
     public <T> void setCrossbowDirty(ComponentType<? super T> type, T value, CallbackInfoReturnable<T> cir)
     {
+        if (MinecraftClient.getInstance().isInSingleplayer()) return;
         ItemStack stack = (ItemStack)(Object) this;
 
         if (stack.getItem() instanceof CrossbowItem)
