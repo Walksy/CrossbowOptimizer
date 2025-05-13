@@ -25,13 +25,10 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
         super(settings);
     }
 
-    @Inject(method = "use", at = @At(value = "HEAD"))
+    @Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/CrossbowItem;shootAll(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/item/ItemStack;FFLnet/minecraft/entity/LivingEntity;)V"))
     private void onUse(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if (MinecraftClient.getInstance().isInSingleplayer()) return;
         ItemStack itemStack = user.getStackInHand(hand);
-        ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
-        if (chargedProjectilesComponent != null && !chargedProjectilesComponent.isEmpty()) {
-            itemStack.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
-        }
+        itemStack.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
     }
 }
