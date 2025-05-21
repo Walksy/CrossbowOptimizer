@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "walksy.crossbowoptimizer.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"client": [
+		"ClientPlayNetworkHandlerMixin",
+		"CrossbowItemMixin",
+		"ItemStackMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

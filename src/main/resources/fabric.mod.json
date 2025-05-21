@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "crossbowoptimizer",
+	"version": "${version}",
+	"name": "Crossbow Optimizer",
+	"description": "Handles crossbow reloading client-side, speeding up reloads on high ms",
+	"authors": [
+		"Walksy"
+	],
+	"contributors": [
+
+	],
+	"contact": {
+		"issues": "https://github.com/Walksy/CrossbowOptimizer/issues",
+		"sources": "https://github.com/Walksy/CrossbowOptimizer",
+		"homepage": "https://discord.com/invite/zeu7uNuBWY"
+	},
+	"license": "MIT",
+	"icon": "assets/walksy/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"walksy.crossbowoptimizer.CrossbowOptimizerMod"
+		],
+		"modmenu": [
+			"walksy.crossbowoptimizer.api.config.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"mixin.crossbowoptimizer.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"minecraft": "*",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}
