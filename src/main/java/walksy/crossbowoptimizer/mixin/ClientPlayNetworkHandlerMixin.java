@@ -91,7 +91,7 @@ public class ClientPlayNetworkHandlerMixin {
     private Stream<ItemStack> getCrossbowStacks() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         return Stream.of(
-                        player.getInventory().main)
+                        player.getInventory().getMainStacks())
                 .flatMap(Collection::stream)
                 .filter(stack -> stack.getItem() instanceof CrossbowItem);
     }
