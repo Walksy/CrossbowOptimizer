@@ -51,9 +51,9 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
         if (!Config.shouldOptimize()) {
             return;
         }
-        MinecraftClient minecraft = MinecraftClient.getInstance();
-        ItemStack itemStack = user.getStackInHand(hand);
-        List<ItemStack> projectiles = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles();
+        final MinecraftClient minecraft = MinecraftClient.getInstance();
+        final ItemStack itemStack = user.getStackInHand(hand);
+        final List<ItemStack> projectiles = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles();
         for (int i = 0; i < projectiles.size() && !CrossbowOptimizer.getSoundsPlayedByClient().contains(SoundEvents.ITEM_CROSSBOW_SHOOT); ++i){
             minecraft.world.playSound(minecraft.player, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 0.5F, this.getSoundPitch(minecraft.player.getRandom(), i));
             CrossbowOptimizer.getSoundsPlayedByClient().add(SoundEvents.ITEM_CROSSBOW_SHOOT);
@@ -62,15 +62,15 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
     }
 
     @Inject(method = "usageTick", at = @At("HEAD"), cancellable = true)
-    public void test(World serverWorld, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
+    public void tickUse(World serverWorld, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
         if (!Config.shouldOptimize()) {
             return;
         }
-        CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
-        MinecraftClient minecraft = MinecraftClient.getInstance();
-        ClientWorld world = minecraft.world;
-        ClientPlayerEntity player = minecraft.player;
-        float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)CrossbowItem.getPullTime(stack, user);
+        final CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
+        final  MinecraftClient minecraft = MinecraftClient.getInstance();
+        final ClientWorld world = minecraft.world;
+        final ClientPlayerEntity player = minecraft.player;
+        final float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)CrossbowItem.getPullTime(stack, user);
         if (f < 0.2F) {
             this.charged = false;
             this.loaded = false;
@@ -79,7 +79,7 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
         if (f >= 0.2F && !this.charged) {
             this.charged = true;
             loadingSounds.start().ifPresent((sound) -> {
-                SoundEvent v = sound.value();
+                final SoundEvent v = sound.value();
                 world.playSound(player, user.getX(), user.getY(), user.getZ(), v, SoundCategory.PLAYERS, 0.5F, 1.0F);
                 CrossbowOptimizer.getSoundsPlayedByClient().add(v);
             });
@@ -88,7 +88,7 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
         if (f >= 0.5F && !this.loaded) {
             this.loaded = true;
             loadingSounds.mid().ifPresent((sound) -> {
-                SoundEvent v = sound.value();
+                final SoundEvent v = sound.value();
                 world.playSound(player, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), SoundCategory.PLAYERS, 0.5F, 1.0F);
                 CrossbowOptimizer.getSoundsPlayedByClient().add(v);
             });
@@ -96,7 +96,7 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
 
         if (f >= 1.0F && !CrossbowItem.isCharged(stack) && this.loadProjectiles(user, stack)) {
             loadingSounds.end().ifPresent((sound) -> {
-                SoundEvent v = sound.value();
+                final SoundEvent v = sound.value();
                 world.playSound(player, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), user.getSoundCategory(), 1.0F, 1.0F / (world.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
                 CrossbowOptimizer.getSoundsPlayedByClient().add(v);
             });
@@ -105,8 +105,8 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
     }
 
     @Unique
-    private boolean loadProjectiles(LivingEntity shooter, ItemStack crossbow) {
-        List<ItemStack> list = load(crossbow, shooter.getProjectileType(crossbow), shooter);
+    private boolean loadProjectiles(final LivingEntity shooter, final ItemStack crossbow) {
+        final List<ItemStack> list = load(crossbow, shooter.getProjectileType(crossbow), shooter);
         if (!list.isEmpty()) {
             crossbow.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(list));
             return true;
@@ -116,13 +116,13 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
     }
 
     @Unique
-    private float getSoundPitch(Random random, int index) {
+    private float getSoundPitch(final Random random, final int index) {
         return index == 0 ? 1.0F : this.getSoundPitch((index & 1) == 1, random);
     }
 
     @Unique
-    private float getSoundPitch(boolean flag, Random random) {
-        float f = flag ? 0.63F : 0.43F;
+    private float getSoundPitch(final boolean flag, final Random random) {
+        final float f = flag ? 0.63F : 0.43F;
         return 1.0F / (random.nextFloat() * 0.5F + 1.8F) + f;
     }
 }

@@ -49,13 +49,13 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
     public void onEntityData(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
-        MinecraftClient minecraft = MinecraftClient.getInstance();
+        final MinecraftClient minecraft = MinecraftClient.getInstance();
         if (!Config.shouldOptimize() || minecraft.world.getEntityById(packet.id()) != minecraft.player) {
             return;
         }
         packet.trackedValues().forEach(value -> {
             if (this.hasActiveCrossbowItem()) {
-                List<DataTracker.SerializedEntry<?>> filtered = packet.trackedValues().stream()
+                final List<DataTracker.SerializedEntry<?>> filtered = packet.trackedValues().stream()
                         //0 = starting item use
                         //1 = stopping item use
                         //8 = consumption of the item, in this case shooting the crossbow
@@ -70,17 +70,17 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Unique
     public boolean hasActiveCrossbowItem() {
-        MinecraftClient minecraft = MinecraftClient.getInstance();
+        final MinecraftClient minecraft = MinecraftClient.getInstance();
         if (minecraft.player.isUsingItem()) {
-            ItemStack stack = minecraft.player.getActiveItem();
+            final ItemStack stack = minecraft.player.getActiveItem();
             return stack.getItem() instanceof CrossbowItem;
         }
         return false;
     }
 
     @Unique
-    public boolean isSoundOverridenByClient(PlaySoundS2CPacket packet) {
-        for (SoundEvent playedSound : CrossbowOptimizer.getSoundsPlayedByClient()) {
+    public boolean isSoundOverridenByClient(final PlaySoundS2CPacket packet) {
+        for (final SoundEvent playedSound : CrossbowOptimizer.getSoundsPlayedByClient()) {
             if (packet.getSound().value() == playedSound) {
                 CrossbowOptimizer.getSoundsPlayedByClient().remove(playedSound);
                 return true;
@@ -90,14 +90,14 @@ public class ClientPlayNetworkHandlerMixin {
     }
 
     @Unique
-    private boolean isCrossbowDirty(ScreenHandlerSlotUpdateS2CPacket packet) {
-        ItemStack pItem = packet.getStack(); //incoming server stack
-        ItemStack cItem = MinecraftClient.getInstance().player.playerScreenHandler.getSlot(packet.getSlot()).getStack(); //the existing item on the client in the slot being updated by the packet
+    private boolean isCrossbowDirty(final ScreenHandlerSlotUpdateS2CPacket packet) {
+        final ItemStack pItem = packet.getStack(); //incoming server stack
+        final ItemStack cItem = MinecraftClient.getInstance().player.playerScreenHandler.getSlot(packet.getSlot()).getStack(); //the existing item on the client in the slot being updated by the packet
         if (!(pItem.getItem() instanceof CrossbowItem) || !(cItem.getItem() instanceof CrossbowItem)) {
             return false;
         }
-        ChargedProjectilesComponent pComp = pItem.get(DataComponentTypes.CHARGED_PROJECTILES);
-        ChargedProjectilesComponent cComp = cItem.get(DataComponentTypes.CHARGED_PROJECTILES);
+        final ChargedProjectilesComponent pComp = pItem.get(DataComponentTypes.CHARGED_PROJECTILES);
+        final ChargedProjectilesComponent cComp = cItem.get(DataComponentTypes.CHARGED_PROJECTILES);
         if (!pComp.getProjectiles().isEmpty()) {
             return true;
         }

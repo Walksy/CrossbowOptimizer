@@ -25,7 +25,7 @@ public class ItemStackMixin {
         if (!Config.shouldOptimize()) {
             return;
         }
-        ItemStack stack = ItemStack.class.cast(this);
+        final ItemStack stack = ItemStack.class.cast(this);
         if (stack.getItem() instanceof CrossbowItem) {
             if (value == ChargedProjectilesComponent.DEFAULT && this.components.get(type) == ChargedProjectilesComponent.DEFAULT) {
                 cir.cancel();

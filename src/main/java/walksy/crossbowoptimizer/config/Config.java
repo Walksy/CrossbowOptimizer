@@ -17,7 +17,7 @@ public class Config implements WalksyLibConfig {
             .build();
 
     public static boolean shouldOptimize() {
-        MinecraftClient minecraft = MinecraftClient.getInstance();
+        final MinecraftClient minecraft = MinecraftClient.getInstance();
         return minecraft.player != null && !minecraft.isInSingleplayer() && Config.modEnabled;
     }
 
