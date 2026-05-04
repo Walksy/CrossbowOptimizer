@@ -127,11 +127,24 @@ public class ClientPlayNetworkHandlerMixin {
         if (!(pItem.getItem() instanceof CrossbowItem) || !(cItem.getItem() instanceof CrossbowItem)) {
             return false;
         }
-        final ChargedProjectilesComponent pComp = pItem.get(DataComponentTypes.CHARGED_PROJECTILES);
-        final ChargedProjectilesComponent cComp = cItem.get(DataComponentTypes.CHARGED_PROJECTILES);
+        this.syncCrossbows(cItem, pItem);
+        final ChargedProjectilesComponent pComp = pItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
+        final ChargedProjectilesComponent cComp = cItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         if (!pComp.getProjectiles().isEmpty()) {
             return true;
         }
         return pComp.getProjectiles().equals(cComp.getProjectiles());
+    }
+
+    @Unique
+    private void syncCrossbows(final ItemStack clientItem, final ItemStack serverItem) {
+        final ChargedProjectilesComponent clientChargedState = clientItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
+        clientItem.setCount(serverItem.getCount());
+        clientItem.applyChanges(serverItem.getComponentChanges());
+        if (clientChargedState.isEmpty()) {
+            clientItem.remove(DataComponentTypes.CHARGED_PROJECTILES);
+        } else {
+            clientItem.set(DataComponentTypes.CHARGED_PROJECTILES, clientChargedState);
+        }
     }
 }
