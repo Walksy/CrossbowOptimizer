@@ -13,6 +13,7 @@ import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -70,11 +71,15 @@ public class ClientPlayNetworkHandlerMixin {
         packet.trackedValues().forEach(value -> {
             if (this.hasActiveCrossbowItem()) {
                 final List<DataTracker.SerializedEntry<?>> filtered = packet.trackedValues().stream()
-                        //0 = starting item use
-                        //1 = stopping item use
-                        //8 = consumption of the item, in this case shooting the crossbow
-                        //TODO: 2 & 3 might be needed for offhand values...
-                        .filter(e -> e != null && e.id() != 1 && e.id() != 0 && e.id() != 8)
+                        .filter(e -> {
+                            if (e == null) {
+                                return false;
+                            }
+                            if (e.id() == 8 && e.value() instanceof Byte b) {
+                                return (b & 1) != 0;
+                            }
+                            return true;
+                        })
                         .toList();
                 minecraft.player.getDataTracker().writeUpdatedEntries(filtered);
                 ci.cancel();
