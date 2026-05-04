@@ -72,8 +72,7 @@ public class ClientPlayNetworkHandlerMixin {
     public boolean hasActiveCrossbowItem() {
         final MinecraftClient minecraft = MinecraftClient.getInstance();
         if (minecraft.player.isUsingItem()) {
-            final ItemStack stack = minecraft.player.getActiveItem();
-            return stack.getItem() instanceof CrossbowItem;
+            return minecraft.player.getActiveItem().getItem() instanceof CrossbowItem;
         }
         return false;
     }
@@ -91,8 +90,9 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Unique
     private boolean isCrossbowDirty(final ScreenHandlerSlotUpdateS2CPacket packet) {
+        final MinecraftClient minecraft = MinecraftClient.getInstance();
         final ItemStack pItem = packet.getStack(); //incoming server stack
-        final ItemStack cItem = MinecraftClient.getInstance().player.playerScreenHandler.getSlot(packet.getSlot()).getStack(); //the existing item on the client in the slot being updated by the packet
+        final ItemStack cItem = minecraft.player.playerScreenHandler.getSlot(packet.getSlot()).getStack(); //the existing item on the client in the slot being updated by the packet
         if (!(pItem.getItem() instanceof CrossbowItem) || !(cItem.getItem() instanceof CrossbowItem)) {
             return false;
         }
