@@ -7,6 +7,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArrowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
@@ -25,13 +26,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import walksy.crossbowoptimizer.CrossbowOptimizer;
+import walksy.crossbowoptimizer.ICrossbowItem;
 import walksy.crossbowoptimizer.config.Config;
 
 import java.util.List;
 
 
 @Mixin(CrossbowItem.class)
-public abstract class CrossbowItemMixin extends RangedWeaponItem {
+public abstract class CrossbowItemMixin extends RangedWeaponItem implements ICrossbowItem {
 
     @Shadow
     abstract CrossbowItem.LoadingSounds getLoadingSounds(ItemStack stack);
@@ -42,8 +44,12 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
     @Shadow
     private boolean loaded;
 
+    @Unique
+    private int arrowCount$client;
+
     public CrossbowItemMixin(Settings settings) {
         super(settings);
+        this.arrowCount$client = -1;
     }
 
     @Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/CrossbowItem;shootAll(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/item/ItemStack;FFLnet/minecraft/entity/LivingEntity;)V"))
@@ -61,13 +67,23 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
         itemStack.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
     }
 
+    @Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setCurrentHand(Lnet/minecraft/util/Hand;)V"), cancellable = true)
+    private void onBeginUse(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        if (!Config.shouldOptimize()) {
+            return;
+        }
+        if (this.arrowCount$client <= 0) {
+            cir.setReturnValue(ActionResult.FAIL);
+        }
+    }
+
     @Inject(method = "usageTick", at = @At("HEAD"), cancellable = true)
     public void tickUse(World serverWorld, LivingEntity user, ItemStack stack, int remainingUseTicks, CallbackInfo ci) {
         if (!Config.shouldOptimize()) {
             return;
         }
         final CrossbowItem.LoadingSounds loadingSounds = this.getLoadingSounds(stack);
-        final  MinecraftClient minecraft = MinecraftClient.getInstance();
+        final MinecraftClient minecraft = MinecraftClient.getInstance();
         final ClientWorld world = minecraft.world;
         final ClientPlayerEntity player = minecraft.player;
         final float f = (float)(stack.getMaxUseTime(user) - remainingUseTicks) / (float)CrossbowItem.getPullTime(stack, user);
@@ -95,6 +111,7 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
         }
 
         if (f >= 1.0F && !CrossbowItem.isCharged(stack) && this.loadProjectiles(user, stack)) {
+            this.arrowCount$client = CrossbowOptimizer.getArrowCount() - 1;
             loadingSounds.end().ifPresent((sound) -> {
                 final SoundEvent v = sound.value();
                 world.playSound(player, user.getX(), user.getY(), user.getZ(), (SoundEvent)sound.value(), user.getSoundCategory(), 1.0F, 1.0F / (world.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
@@ -102,6 +119,16 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem {
             });
         }
         ci.cancel();
+    }
+
+    @Override
+    public void setArrowCount$client(int count) {
+        this.arrowCount$client = count;
+    }
+
+    @Override
+    public int getArrowCount$client() {
+        return arrowCount$client;
     }
 
     @Unique

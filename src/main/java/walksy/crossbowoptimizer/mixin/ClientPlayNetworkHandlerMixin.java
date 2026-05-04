@@ -2,10 +2,12 @@ package walksy.crossbowoptimizer.mixin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.item.ArrowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
@@ -20,21 +22,36 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import walksy.crossbowoptimizer.CrossbowOptimizer;
+import walksy.crossbowoptimizer.ICrossbowItem;
 import walksy.crossbowoptimizer.config.Config;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
-    public void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
+    public void onScreenHandlerSlotUpdate$beforeUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
         if (!Config.shouldOptimize()) {
             return;
         }
+
         if (this.isCrossbowDirty(packet)) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "onScreenHandlerSlotUpdate", at = @At(value = "TAIL"))
+    public void onScreenHandlerSlotUpdate$afterUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
+        if (!Config.shouldOptimize() || !(packet.getStack().getItem() instanceof ArrowItem)) {
+            return;
+        }
+
+        this.getCrossbowStacks().forEach(crossbow -> {
+            ((ICrossbowItem)(CrossbowItem)crossbow.getItem()).setArrowCount$client(CrossbowOptimizer.getArrowCount());
+        });
     }
 
     @Inject(method = "onPlaySound", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
@@ -66,6 +83,15 @@ public class ClientPlayNetworkHandlerMixin {
                 ci.cancel();
             }
         });
+    }
+
+    @Unique
+    private Stream<ItemStack> getCrossbowStacks() {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        return Stream.of(
+                        player.getInventory().getMainStacks())
+                .flatMap(Collection::stream)
+                .filter(stack -> stack.getItem() instanceof CrossbowItem);
     }
 
     @Unique
