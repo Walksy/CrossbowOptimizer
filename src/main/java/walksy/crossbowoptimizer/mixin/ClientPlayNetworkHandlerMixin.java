@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
 
-    @Inject(method = "onScreenHandlerSlotUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onScreenHandlerSlotUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V", shift = At.Shift.AFTER), cancellable = true)
     public void onScreenHandlerSlotUpdate$beforeUpdate(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
         if (!Config.shouldOptimize()) {
             return;
@@ -52,7 +52,7 @@ public class ClientPlayNetworkHandlerMixin {
         });
     }
 
-    @Inject(method = "onPlaySound", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onPlaySound", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V", shift = At.Shift.AFTER), cancellable = true)
     public void onPlaySound(PlaySoundS2CPacket packet, CallbackInfo ci) {
         if (!Config.shouldOptimize()) {
             return;
@@ -62,7 +62,7 @@ public class ClientPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V", shift = At.Shift.AFTER), cancellable = true)
     public void onEntityData(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
         final MinecraftClient minecraft = MinecraftClient.getInstance();
         if (!Config.shouldOptimize() || minecraft.world.getEntityById(packet.id()) != minecraft.player) {
@@ -91,7 +91,7 @@ public class ClientPlayNetworkHandlerMixin {
     private Stream<ItemStack> getCrossbowStacks() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         return Stream.of(
-                        player.getInventory().getMainStacks())
+                        player.getInventory().main)
                 .flatMap(Collection::stream)
                 .filter(stack -> stack.getItem() instanceof CrossbowItem);
     }
