@@ -32,7 +32,7 @@ public class ClientPlayNetworkHandlerMixin {
         if (!Config.shouldOptimize()) {
             return;
         }
-        if (this.anyDirtyCrossbowItems(packet)) {
+        if (this.isCrossbowDirty(packet)) {
             ci.cancel();
         }
     }
@@ -90,7 +90,7 @@ public class ClientPlayNetworkHandlerMixin {
     }
 
     @Unique
-    private boolean anyDirtyCrossbowItems(ScreenHandlerSlotUpdateS2CPacket packet) {
+    private boolean isCrossbowDirty(ScreenHandlerSlotUpdateS2CPacket packet) {
         ItemStack pItem = packet.getStack(); //incoming server stack
         ItemStack cItem = MinecraftClient.getInstance().player.playerScreenHandler.getSlot(packet.getSlot()).getStack(); //the existing item on the client in the slot being updated by the packet
         if (!(pItem.getItem() instanceof CrossbowItem) || !(cItem.getItem() instanceof CrossbowItem)) {
