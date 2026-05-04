@@ -1,16 +1,17 @@
 package walksy.crossbowoptimizer.mixin;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArrowItem;
-import net.minecraft.item.CrossbowItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.RangedWeaponItem;
+import net.minecraft.item.*;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -30,6 +31,7 @@ import walksy.crossbowoptimizer.ICrossbowItem;
 import walksy.crossbowoptimizer.config.Config;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Mixin(CrossbowItem.class)
@@ -59,8 +61,8 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem implements ICro
         }
         final MinecraftClient minecraft = MinecraftClient.getInstance();
         final ItemStack itemStack = user.getStackInHand(hand);
-        final List<ItemStack> projectiles = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES).getProjectiles();
-        for (int i = 0; i < projectiles.size() && !CrossbowOptimizer.getSoundsPlayedByClient().contains(SoundEvents.ITEM_CROSSBOW_SHOOT); ++i){
+        final int projectileSize = this.hasMultiShot(itemStack) ? 3 : 1;
+        for (int i = 0; i < projectileSize; ++i) {
             minecraft.world.playSound(minecraft.player, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 0.5F, this.getSoundPitch(minecraft.player.getRandom(), i));
             CrossbowOptimizer.getSoundsPlayedByClient().add(SoundEvents.ITEM_CROSSBOW_SHOOT);
         }
@@ -128,7 +130,22 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem implements ICro
 
     @Override
     public int getArrowCount$client() {
-        return arrowCount$client;
+        return this.arrowCount$client;
+    }
+
+    @Unique
+    private boolean hasMultiShot(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        Set<Object2IntMap.Entry<RegistryEntry<Enchantment>>> enchantments = stack.getEnchantments().getEnchantmentEntries();
+        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : enchantments) {
+            if (entry.getKey().matchesKey(Enchantments.MULTISHOT)) {
+                return entry.getIntValue() > 0;
+            }
+        }
+
+        return false;
     }
 
     @Unique

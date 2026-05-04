@@ -5,17 +5,14 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ArrowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -59,7 +56,7 @@ public class ClientPlayNetworkHandlerMixin {
         if (!Config.shouldOptimize()) {
             return;
         }
-        if (this.isSoundOverridenByClient(packet)) {
+        if (this.wasSoundOverridenByClient(packet)) {
             ci.cancel();
         }
     }
@@ -104,7 +101,7 @@ public class ClientPlayNetworkHandlerMixin {
     }
 
     @Unique
-    public boolean isSoundOverridenByClient(final PlaySoundS2CPacket packet) {
+    public boolean wasSoundOverridenByClient(final PlaySoundS2CPacket packet) {
         for (final SoundEvent playedSound : CrossbowOptimizer.getSoundsPlayedByClient()) {
             if (packet.getSound().value() == playedSound) {
                 CrossbowOptimizer.getSoundsPlayedByClient().remove(playedSound);
