@@ -3,7 +3,7 @@
 	"id": "crossbowoptimizer",
 	"version": "${version}",
 	"name": "Crossbow Optimizer",
-	"description": "Handles crossbow reloading client-side, speeding up reloads on high ms",
+	"description": "Handles crossbow reloading client-side",
 	"authors": [
 		"Walksy"
 	],
@@ -20,10 +20,10 @@
 	"environment": "client",
 	"entrypoints": {
 		"main": [
-			"walksy.crossbowoptimizer.CrossbowOptimizerMod"
+			"walksy.crossbowoptimizer.CrossbowOptimizer"
 		],
-		"modmenu": [
-			"walksy.crossbowoptimizer.api.config.ModMenuIntegration"
+		"walksylib": [
+			"walksy.crossbowoptimizer.config.WalksyLibIntegration"
 		]
 	},
 	"mixins": [

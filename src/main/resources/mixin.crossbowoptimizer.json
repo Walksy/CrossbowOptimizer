@@ -5,7 +5,8 @@
 	"client": [
 		"ClientPlayNetworkHandlerMixin",
 		"CrossbowItemMixin",
-		"ItemStackMixin"
+		"ItemStackMixin",
+		"ClientPlayerEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

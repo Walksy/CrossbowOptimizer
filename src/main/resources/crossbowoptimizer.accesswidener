@@ -1,0 +1,2 @@
+accessWidener v1 named
+accessible field net/minecraft/entity/LivingEntity LIVING_FLAGS Lnet/minecraft/entity/data/TrackedData;
