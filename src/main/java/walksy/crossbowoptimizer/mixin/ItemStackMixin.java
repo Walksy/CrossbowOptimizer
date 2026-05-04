@@ -1,7 +1,7 @@
 package walksy.crossbowoptimizer.mixin;
 
-import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.MergedComponentMap;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
@@ -18,7 +18,7 @@ public class ItemStackMixin {
 
     @Shadow
     @Final
-    private ComponentMapImpl components;
+    private MergedComponentMap components;
 
     @Inject(method = "set(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)Ljava/lang/Object;", at = @At("HEAD"), cancellable = true)
     public <T> void setComponent(ComponentType<? super T> type, T value, CallbackInfoReturnable<T> cir) {
