@@ -5,6 +5,8 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ArrowItem;
 import net.minecraft.item.CrossbowItem;
@@ -140,7 +142,29 @@ public class ClientPlayNetworkHandlerMixin {
     private void syncCrossbows(final ItemStack clientItem, final ItemStack serverItem) {
         final ChargedProjectilesComponent clientChargedState = clientItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         clientItem.setCount(serverItem.getCount());
-        clientItem.applyChanges(serverItem.getComponentChanges());
+        clientItem.setDamage(serverItem.getDamage());
+        ItemEnchantmentsComponent serverEnchantComponents = serverItem.getEnchantments();
+        EnchantmentHelper.set(clientItem, serverEnchantComponents);
+
+        //clientItem.applyChanges doesn't seem to work here...
+        if (serverItem.contains(DataComponentTypes.CUSTOM_NAME)) {
+            clientItem.set(DataComponentTypes.CUSTOM_NAME, serverItem.get(DataComponentTypes.CUSTOM_NAME));
+        } else {
+            clientItem.remove(DataComponentTypes.CUSTOM_NAME);
+        }
+
+        if (serverItem.contains(DataComponentTypes.LORE)) {
+            clientItem.set(DataComponentTypes.LORE, serverItem.get(DataComponentTypes.LORE));
+        } else {
+            clientItem.remove(DataComponentTypes.LORE);
+        }
+
+        if (serverItem.contains(DataComponentTypes.CUSTOM_MODEL_DATA)) {
+            clientItem.set(DataComponentTypes.CUSTOM_MODEL_DATA, serverItem.get(DataComponentTypes.CUSTOM_MODEL_DATA));
+        } else {
+            clientItem.remove(DataComponentTypes.CUSTOM_MODEL_DATA);
+        }
+
         if (clientChargedState.isEmpty()) {
             clientItem.remove(DataComponentTypes.CHARGED_PROJECTILES);
         } else {
