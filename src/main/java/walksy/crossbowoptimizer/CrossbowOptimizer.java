@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CrossbowOptimizer implements ModInitializer {
 
     private static final CopyOnWriteArrayList<SoundEvent> SOUNDS = new CopyOnWriteArrayList<>();
-    private static int timeSinceLastShot = -1;
+    private static int timeSinceLastShot = 0;
 
     @Override
     public void onInitialize() {
@@ -22,9 +22,7 @@ public class CrossbowOptimizer implements ModInitializer {
     }
 
     void tick(MinecraftClient minecraft) {
-        if (timeSinceLastShot != -1) {
-            timeSinceLastShot++;
-        }
+        timeSinceLastShot++;
     }
 
     public static void onShoot() {

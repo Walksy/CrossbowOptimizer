@@ -132,6 +132,7 @@ public class ClientPlayNetworkHandlerMixin {
         this.syncCrossbows(cItem, pItem);
         final ChargedProjectilesComponent pComp = pItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         final ChargedProjectilesComponent cComp = cItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
+        minecraft.player.sendMessage(Text.of(pComp.toString() + " " + cComp.toString() + " - " + CrossbowOptimizer.shotRecently() + " " + !pComp.getProjectiles().isEmpty() + " - " + pComp.getProjectiles().equals(cComp.getProjectiles())), false);
         if (!pComp.getProjectiles().isEmpty() && CrossbowOptimizer.shotRecently()) {
             return true;
         }
