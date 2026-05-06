@@ -1,21 +1,38 @@
 package walksy.crossbowoptimizer;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ArrowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CrossbowOptimizer implements ModInitializer {
 
     private static final CopyOnWriteArrayList<SoundEvent> SOUNDS = new CopyOnWriteArrayList<>();
+    private static int timeSinceLastShot = -1;
 
     @Override
     public void onInitialize() {
+        ClientTickEvents.START_CLIENT_TICK.register(this::tick);
+    }
 
+    void tick(MinecraftClient minecraft) {
+        if (timeSinceLastShot != -1) {
+            timeSinceLastShot++;
+        }
+    }
+
+    public static void onShoot() {
+        timeSinceLastShot = 0;
+    }
+
+    public static boolean shotRecently() {
+        return timeSinceLastShot < 10;
     }
 
     public static int getArrowCount() {

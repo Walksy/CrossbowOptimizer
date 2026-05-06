@@ -67,6 +67,7 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem implements ICro
             CrossbowOptimizer.getSoundsPlayedByClient().add(SoundEvents.ITEM_CROSSBOW_SHOOT);
         }
         itemStack.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
+        CrossbowOptimizer.onShoot();
     }
 
     @Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setCurrentHand(Lnet/minecraft/util/Hand;)V"), cancellable = true)

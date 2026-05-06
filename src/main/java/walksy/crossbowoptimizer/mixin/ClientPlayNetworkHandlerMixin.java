@@ -132,7 +132,7 @@ public class ClientPlayNetworkHandlerMixin {
         this.syncCrossbows(cItem, pItem);
         final ChargedProjectilesComponent pComp = pItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         final ChargedProjectilesComponent cComp = cItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
-        if (!pComp.getProjectiles().isEmpty()) {
+        if (!pComp.getProjectiles().isEmpty() && CrossbowOptimizer.shotRecently()) {
             return true;
         }
         return pComp.getProjectiles().equals(cComp.getProjectiles());
@@ -143,7 +143,7 @@ public class ClientPlayNetworkHandlerMixin {
         final ChargedProjectilesComponent clientChargedState = clientItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         clientItem.setCount(serverItem.getCount());
         clientItem.setDamage(serverItem.getDamage());
-        ItemEnchantmentsComponent serverEnchantComponents = serverItem.getEnchantments();
+        final ItemEnchantmentsComponent serverEnchantComponents = serverItem.getEnchantments();
         EnchantmentHelper.set(clientItem, serverEnchantComponents);
 
         //clientItem.applyChanges doesn't seem to work here...
