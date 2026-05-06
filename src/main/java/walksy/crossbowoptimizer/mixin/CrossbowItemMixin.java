@@ -129,11 +129,6 @@ public abstract class CrossbowItemMixin extends RangedWeaponItem implements ICro
         this.arrowCount$client = count;
     }
 
-    @Override
-    public int getArrowCount$client() {
-        return this.arrowCount$client;
-    }
-
     @Unique
     private boolean hasMultiShot(ItemStack stack) {
         if (stack.isEmpty()) {

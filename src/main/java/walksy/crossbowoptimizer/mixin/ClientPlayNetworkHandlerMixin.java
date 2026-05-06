@@ -15,7 +15,6 @@ import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -132,7 +131,6 @@ public class ClientPlayNetworkHandlerMixin {
         this.syncCrossbows(cItem, pItem);
         final ChargedProjectilesComponent pComp = pItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
         final ChargedProjectilesComponent cComp = cItem.getOrDefault(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT);
-        minecraft.player.sendMessage(Text.of(pComp.toString() + " " + cComp.toString() + " - " + CrossbowOptimizer.shotRecently() + " " + !pComp.getProjectiles().isEmpty() + " - " + pComp.getProjectiles().equals(cComp.getProjectiles())), false);
         if (!pComp.getProjectiles().isEmpty() && CrossbowOptimizer.shotRecently()) {
             return true;
         }
