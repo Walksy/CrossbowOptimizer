@@ -36,7 +36,6 @@ public class ClientPlayNetworkHandlerMixin {
         if (!Config.shouldOptimize()) {
             return;
         }
-
         if (this.isCrossbowDirty(packet)) {
             ci.cancel();
         }
@@ -119,12 +118,19 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Unique
     private boolean isCrossbowDirty(final ScreenHandlerSlotUpdateS2CPacket packet) {
+        if (packet.getSyncId() != 0) {
+            return false;
+        }
         final MinecraftClient minecraft = MinecraftClient.getInstance();
         if (minecraft.currentScreen != null) {
             return false;
         }
-        final ItemStack pItem = packet.getStack(); //incoming server stack
-        final ItemStack cItem = minecraft.player.playerScreenHandler.getSlot(packet.getSlot()).getStack(); //the existing item on the client in the slot being updated by the packet
+        final int slot = packet.getSlot();
+        if (slot < 0 || slot >= minecraft.player.playerScreenHandler.slots.size()) {
+            return false;
+        }
+        final ItemStack pItem = packet.getStack();
+        final ItemStack cItem = minecraft.player.playerScreenHandler.getSlot(slot).getStack();
         if (!(pItem.getItem() instanceof CrossbowItem) || !(cItem.getItem() instanceof CrossbowItem)) {
             return false;
         }
@@ -134,6 +140,7 @@ public class ClientPlayNetworkHandlerMixin {
         if (!pComp.getProjectiles().isEmpty() && CrossbowOptimizer.shotRecently()) {
             return true;
         }
+
         return pComp.getProjectiles().equals(cComp.getProjectiles());
     }
 
